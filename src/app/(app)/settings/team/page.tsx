@@ -35,7 +35,7 @@ const mockTeam: TeamMember[] = [
   { id: "4", name: "Diana Miller", email: "diana@example.com", avatar: "https://picsum.photos/seed/204/40/40", role: "Editor" },
 ];
 
-export default function TeamPage() {
+export default function TeamAndApprovalsPage() {
   return (
     <Card>
       <CardHeader>

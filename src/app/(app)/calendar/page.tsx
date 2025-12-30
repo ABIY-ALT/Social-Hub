@@ -68,7 +68,7 @@ const Day = ({ day, isCurrentMonth, isToday, posts }: { day: Date, isCurrentMont
   </div>
 );
 
-export default function CalendarPage() {
+export default function ContentPlannerPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const start = startOfWeek(startOfMonth(currentDate), { weekStartsOn: 0 });
@@ -78,7 +78,7 @@ export default function CalendarPage() {
 
   return (
     <>
-      <Header title="Content Calendar">
+      <Header title="Content Planner">
         <div className="flex items-center gap-2">
             <Button variant="outline" size="icon" onClick={() => setCurrentDate(subMonths(currentDate, 1))}>
                 <ChevronLeft className="h-4 w-4" />

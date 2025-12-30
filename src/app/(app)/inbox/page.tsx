@@ -90,7 +90,7 @@ export default function InboxPage() {
 
   return (
     <>
-      <Header title="Unified Inbox">
+      <Header title="Inbox">
         <Button variant="outline">
           <Filter className="mr-2 h-4 w-4" /> Filter
         </Button>

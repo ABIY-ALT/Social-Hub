@@ -3,24 +3,24 @@
 import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FacebookIcon, InstagramIcon, XIcon, LinkedInIcon, TikTokIcon, YouTubeIcon, socialIcons } from "@/components/icons";
+import { socialIcons } from "@/components/icons";
 import type { SocialAccount } from "@/lib/types";
 
 const initialAccounts: SocialAccount[] = [
-    { id: "fb", platform: "Facebook", username: "Not Connected", avatar: "", isConnected: false, Icon: FacebookIcon },
-    { id: "ig", platform: "Instagram", username: "@socialcentral", avatar: "", isConnected: true, Icon: InstagramIcon },
-    { id: "x", platform: "X", username: "@Social_Central", avatar: "", isConnected: true, Icon: XIcon },
-    { id: "li", platform: "LinkedIn", username: "Not Connected", avatar: "", isConnected: false, Icon: LinkedInIcon },
-    { id: "tt", platform: "TikTok", username: "Not Connected", avatar: "", isConnected: false, Icon: TikTokIcon },
-    { id: "yt", platform: "YouTube", username: "Social Central", avatar: "", isConnected: true, Icon: YouTubeIcon },
+    { id: "fb", platform: "Facebook", username: "Not Connected", avatar: "", isConnected: false, Icon: socialIcons.Facebook },
+    { id: "ig", platform: "Instagram", username: "@socialcentral", avatar: "", isConnected: true, Icon: socialIcons.Instagram },
+    { id: "x", platform: "X", username: "@Social_Central", avatar: "", isConnected: true, Icon: socialIcons.X },
+    { id: "li", platform: "LinkedIn", username: "Not Connected", avatar: "", isConnected: false, Icon: socialIcons.LinkedIn },
+    { id: "tt", platform: "TikTok", username: "Not Connected", avatar: "", isConnected: false, Icon: socialIcons.TikTok },
+    { id: "yt", platform: "YouTube", username: "Social Central", avatar: "", isConnected: true, Icon: socialIcons.YouTube },
 ]
 
-export default function AccountsPage() {
+export default function SocialAccountsPage() {
     const [accounts, setAccounts] = useState(initialAccounts);
 
     const toggleConnection = (id: string) => {
         setAccounts(prev => prev.map(acc => 
-            acc.id === id ? { ...acc, isConnected: !acc.isConnected, username: !acc.isConnected ? `@${acc.platform.toLowerCase()}_user` : 'Not Connected' } : acc
+            acc.id === id ? { ...acc, isConnected: !acc.isConnected, username: !acc.isConnected ? `@${'social_user'}` : 'Not Connected' } : acc
         ));
     }
 

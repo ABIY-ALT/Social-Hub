@@ -1,10 +1,10 @@
 import { Header } from "@/components/layout/header";
 import { ContentCreationForm } from "./content-creation-form";
 
-export default function ContentCreationPage() {
+export default function PostComposerPage() {
   return (
     <>
-      <Header title="AI Content Creation" />
+      <Header title="Post Composer" />
       <ContentCreationForm />
     </>
   );

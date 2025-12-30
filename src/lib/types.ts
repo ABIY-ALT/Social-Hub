@@ -30,3 +30,10 @@ export type TeamMember = {
   avatar: string;
   role: "Admin" | "Editor" | "Viewer";
 };
+
+export type UserRole = 'Admin' | 'Manager' | 'Editor';
+
+export type User = {
+  name: string;
+  role: UserRole;
+}

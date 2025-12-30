@@ -36,7 +36,7 @@ export default function AnalyticsPage() {
 
   return (
     <>
-      <Header title="Analytics Dashboard">
+      <Header title="Analytics & Reports">
         <div className="hidden sm:block">
           <DateRangePicker date={date} onDateChange={setDate} />
         </div>

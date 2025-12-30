@@ -18,7 +18,7 @@ export default function SettingsLayout({
       <Tabs defaultValue={pathname} className="w-full">
         <TabsList className="grid w-full grid-cols-2 max-w-sm">
           <TabsTrigger value="/settings/accounts" asChild>
-            <Link href="/settings/accounts">Accounts</Link>
+            <Link href="/settings">Social Accounts</Link>
           </TabsTrigger>
           <TabsTrigger value="/settings/team" asChild>
             <Link href="/settings/team">Team</Link>
