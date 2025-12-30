@@ -21,6 +21,7 @@ export type InboxMessage = {
   };
   content: string;
   timestamp: string;
+  unread?: boolean;
 };
 
 export type TeamMember = {
