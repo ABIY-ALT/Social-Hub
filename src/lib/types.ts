@@ -1,0 +1,32 @@
+import type { LucideIcon } from "lucide-react";
+
+export type SocialPlatform = "Facebook" | "Instagram" | "X" | "LinkedIn" | "TikTok" | "YouTube";
+
+export type SocialAccount = {
+  id: string;
+  platform: SocialPlatform;
+  username: string;
+  avatar: string;
+  isConnected: boolean;
+  Icon: React.ElementType;
+};
+
+export type InboxMessage = {
+  id: string;
+  platform: SocialPlatform;
+  type: "message" | "comment";
+  sender: {
+    name: string;
+    avatar: string;
+  };
+  content: string;
+  timestamp: string;
+};
+
+export type TeamMember = {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string;
+  role: "Admin" | "Editor" | "Viewer";
+};
