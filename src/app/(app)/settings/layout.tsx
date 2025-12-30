@@ -15,17 +15,21 @@ export default function SettingsLayout({
   return (
     <>
       <Header title="Settings" />
-      <Tabs defaultValue={pathname} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-sm">
-          <TabsTrigger value="/settings/accounts" asChild>
-            <Link href="/settings">Social Accounts</Link>
-          </TabsTrigger>
-          <TabsTrigger value="/settings/team" asChild>
-            <Link href="/settings/team">Team</Link>
-          </TabsTrigger>
-        </TabsList>
-        <div className="mt-6">{children}</div>
-      </Tabs>
+      <div className="grid gap-6 md:grid-cols-[180px_1fr]">
+        <nav>
+          <Tabs defaultValue={pathname} orientation="vertical" className="w-full">
+            <TabsList className="grid w-full grid-cols-1 h-auto bg-transparent p-0">
+              <TabsTrigger value="/settings/accounts" asChild className="justify-start data-[state=active]:bg-muted data-[state=active]:shadow-none">
+                <Link href="/settings/accounts">Social Accounts</Link>
+              </TabsTrigger>
+              <TabsTrigger value="/settings/team" asChild className="justify-start data-[state=active]:bg-muted data-[state=active]:shadow-none">
+                <Link href="/settings/team">Team</Link>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </nav>
+        <div className="md:col-span-1">{children}</div>
+      </div>
     </>
   );
 }
