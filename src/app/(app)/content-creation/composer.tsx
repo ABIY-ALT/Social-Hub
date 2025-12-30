@@ -12,6 +12,7 @@ import {
   Sparkles,
   Loader2,
   X as XIcon,
+  Check,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -245,47 +246,50 @@ export function Composer() {
           </CardHeader>
           <CardContent className="space-y-6">
             {selectedPlatforms.length > 0 ? (
-              selectedPlatforms.map((platform) => (
-                <div key={platform}>
-                  <div className="flex items-center gap-2 mb-2">
-                    {React.createElement(socialIcons[platform], { className: "h-5 w-5" })}
-                    <h3 className="font-semibold">{platform} Preview</h3>
-                  </div>
-                  <div className="rounded-lg border p-4 bg-muted/50">
-                    <div className="flex items-start gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback>A</AvatarFallback>
-                      </Avatar>
-                      <div className="w-full">
-                        <div className="font-bold text-sm">Alex</div>
-                        <p className="text-sm whitespace-pre-wrap mt-1">
-                          {postContent || (
-                            <span className="text-muted-foreground">Your content will appear here...</span>
-                          )}
-                        </p>
-                         {media.length > 0 && (
+              selectedPlatforms.map((platform) => {
+                const PlatformIcon = socialIcons[platform];
+                return (
+                  <div key={platform}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <PlatformIcon className="h-5 w-5" />
+                      <h3 className="font-semibold">{platform} Preview</h3>
+                    </div>
+                    <div className="rounded-lg border p-4 bg-muted/50">
+                      <div className="flex items-start gap-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback>A</AvatarFallback>
+                        </Avatar>
+                        <div className="w-full">
+                          <div className="font-bold text-sm">Alex</div>
+                          <p className="text-sm whitespace-pre-wrap mt-1">
+                            {postContent || (
+                              <span className="text-muted-foreground">Your content will appear here...</span>
+                            )}
+                          </p>
+                          {media.length > 0 && (
                             <div className="mt-2 relative">
-                                <Image
-                                    src={media[0]}
-                                    alt="Post media preview"
-                                    width={400}
-                                    height={400}
-                                    className="rounded-md object-cover aspect-video w-full"
-                                    data-ai-hint="social media image"
-                                />
-                                {media.length > 1 && (
-                                    <Badge className="absolute top-2 right-2" variant="secondary">
-                                        <Copy className="h-3 w-3 mr-1" />
-                                        1/{media.length}
-                                    </Badge>
-                                )}
+                              <Image
+                                src={media[0]}
+                                alt="Post media preview"
+                                width={400}
+                                height={400}
+                                className="rounded-md object-cover aspect-video w-full"
+                                data-ai-hint="social media image"
+                              />
+                              {media.length > 1 && (
+                                <Badge className="absolute top-2 right-2" variant="secondary">
+                                  <Copy className="h-3 w-3 mr-1" />
+                                  1/{media.length}
+                                </Badge>
+                              )}
                             </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-48">
                 <PlusCircle className="h-8 w-8 mb-2" />

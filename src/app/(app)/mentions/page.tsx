@@ -29,7 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { socialIcons } from "@/components/icons";
 import type { SocialPlatform } from "@/lib/types";
-import { Separator }s "@/components/ui/separator";
+import { Separator } from "@/components/ui/separator";
 
 type Sentiment = "Positive" | "Neutral" | "Negative";
 
