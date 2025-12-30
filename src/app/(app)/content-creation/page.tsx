@@ -1,11 +1,11 @@
 import { Header } from "@/components/layout/header";
-import { ContentCreationForm } from "./content-creation-form";
+import { Composer } from "./composer";
 
 export default function ContentCreationPage() {
   return (
     <>
       <Header title="Post Composer" />
-      <ContentCreationForm />
+      <Composer />
     </>
   );
 }

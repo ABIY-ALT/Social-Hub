@@ -3,3 +3,4 @@ config();
 
 import '@/ai/flows/analyze-content-risk-and-rewrite.ts';
 import '@/ai/flows/generate-social-media-content.ts';
+import '@/ai/flows/generate-social-media-hashtags.ts';
