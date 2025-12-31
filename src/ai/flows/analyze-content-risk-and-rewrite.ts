@@ -26,12 +26,21 @@ export type AnalyzeContentRiskAndRewriteInput = z.infer<
 >;
 
 const AnalyzeContentRiskAndRewriteOutputSchema = z.object({
+  riskScore: z
+    .enum(['Low', 'Medium', 'High'])
+    .describe('An overall risk score for the content.'),
+  riskCategories: z
+    .array(z.string())
+    .describe('A list of identified risk categories (e.g., Reputation, Legal, Security).'),
   riskAnalysis: z
     .string()
-    .describe('An analysis of potential risks associated with the content (reputation, legal, security).'),
+    .describe('A detailed analysis of potential risks associated with the content.'),
   safeRewriteRecommendation: z
     .string()
     .describe('A safe rewrite recommendation to mitigate identified risks.'),
+  requiresApproval: z
+    .boolean()
+    .describe('Whether the content should require manual approval before posting based on the risk analysis.'),
 });
 export type AnalyzeContentRiskAndRewriteOutput = z.infer<
   typeof AnalyzeContentRiskAndRewriteOutputSchema
@@ -47,20 +56,21 @@ const prompt = ai.definePrompt({
   name: 'analyzeContentRiskAndRewritePrompt',
   input: {schema: AnalyzeContentRiskAndRewriteInputSchema},
   output: {schema: AnalyzeContentRiskAndRewriteOutputSchema},
-  prompt: `You are an AI-powered social media risk analysis tool.
+  prompt: `You are an AI-powered social media risk analysis tool. Your task is to analyze social media content for potential risks and provide a safe rewrite.
 
-You will analyze the provided social media content for potential risks related to reputation, legal issues, and security vulnerabilities.
-Based on the analysis, you will provide a safe rewrite recommendation to mitigate these risks.
+You will analyze the provided content for potential risks related to reputation, legal issues, and security vulnerabilities.
+Based on your analysis, you will:
+1.  Assign a 'riskScore' of "Low", "Medium", or "High".
+2.  Identify the relevant 'riskCategories' from: "Reputation", "Legal", "Security", "Brand Voice", "Claims", "Trivial". If no risks are found, use ["Trivial"].
+3.  Provide a detailed 'riskAnalysis' explaining your reasoning.
+4.  Suggest a 'safeRewriteRecommendation' to mitigate these risks. If no rewrite is needed, return the original content.
+5.  Set 'requiresApproval' to true if the riskScore is 'Medium' or 'High', and false if it's 'Low'.
 
 Content: {{{content}}}
 Platform: {{{platform}}}
 Content Goal: {{{contentGoal}}}
 
-Respond with a risk analysis and a safe rewrite recommendation.
-
-Risk Analysis:
-
-Safe Rewrite Recommendation:`,
+Respond with the structured output as defined.`,
 });
 
 const analyzeContentRiskAndRewriteFlow = ai.defineFlow(

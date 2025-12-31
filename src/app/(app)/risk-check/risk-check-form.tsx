@@ -33,9 +33,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShieldAlert, ShieldCheck, ShieldQuestion } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 const formSchema = z.object({
   content: z.string().min(10, {
@@ -44,6 +46,81 @@ const formSchema = z.object({
   contentGoal: z.string(),
   platform: z.string(),
 });
+
+type RiskScore = "Low" | "Medium" | "High";
+
+const riskConfig: Record<RiskScore, { icon: React.ElementType, color: string, label: string }> = {
+    Low: { icon: ShieldCheck, color: "text-green-500", label: "Low Risk" },
+    Medium: { icon: ShieldAlert, color: "text-yellow-500", label: "Medium Risk" },
+    High: { icon: ShieldAlert, color: "text-red-500", label: "High Risk" },
+};
+
+const RiskAnalysisResult = ({ result, loading }: { result: AnalyzeContentRiskAndRewriteOutput | null; loading: boolean; }) => {
+    if (loading) {
+        return (
+            <div className="space-y-4">
+                <Skeleton className="h-8 w-1/4" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-16 w-full" />
+            </div>
+        );
+    }
+
+    if (!result) {
+        return (
+            <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-full min-h-[300px]">
+                <ShieldQuestion className="h-12 w-12 mb-4" />
+                <p>Your content analysis will appear here.</p>
+            </div>
+        );
+    }
+    
+    const config = riskConfig[result.riskScore];
+    const Icon = config.icon;
+
+    return (
+        <Card>
+            <CardHeader>
+                <div className="flex items-center justify-between">
+                    <div>
+                        <CardTitle>Analysis Complete</CardTitle>
+                        <CardDescription>Review the AI-powered risk assessment.</CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Icon className={cn("h-6 w-6", config.color)} />
+                        <span className={cn("text-lg font-bold", config.color)}>{config.label}</span>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div>
+                    <h4 className="font-semibold mb-2">Risk Categories</h4>
+                    <div className="flex flex-wrap gap-2">
+                        {result.riskCategories.map(category => (
+                            <Badge key={category} variant="secondary">{category}</Badge>
+                        ))}
+                    </div>
+                </div>
+                 <div>
+                    <h4 className="font-semibold mb-2">AI Explanation</h4>
+                    <p className="text-sm text-muted-foreground">{result.riskAnalysis}</p>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-2">Recommended Safe Rewrite</h4>
+                    <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-md">{result.safeRewriteRecommendation}</p>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-2">Approval Status</h4>
+                    <Badge variant={result.requiresApproval ? "destructive" : "default"}>
+                        {result.requiresApproval ? "Requires Manual Approval" : "Approved for Publishing"}
+                    </Badge>
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
+
 
 export function RiskCheckForm() {
   const [loading, setLoading] = useState(false);
@@ -170,47 +247,7 @@ export function RiskCheckForm() {
           </Form>
         </CardContent>
       </Card>
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Risk Analysis</CardTitle>
-          </CardHeader>
-          <CardContent className="min-h-[120px]">
-            {loading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-              </div>
-            ) : result ? (
-              <p className="text-sm">{result.riskAnalysis}</p>
-            ) : (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                    Analysis will appear here.
-                </div>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Safe Rewrite Recommendation</CardTitle>
-          </CardHeader>
-          <CardContent className="min-h-[120px]">
-             {loading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-              </div>
-            ) : result ? (
-              <p className="text-sm">{result.safeRewriteRecommendation}</p>
-            ) : (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                    Rewrite will appear here.
-                </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <RiskAnalysisResult result={result} loading={loading} />
     </div>
   );
 }

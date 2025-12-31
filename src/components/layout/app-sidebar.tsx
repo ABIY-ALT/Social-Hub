@@ -24,6 +24,7 @@ import {
   Settings,
   Flame,
   Sparkles,
+  ShieldCheck,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -54,6 +55,7 @@ const menuItems: MenuItem[] = [
   { href: '/planner', label: 'Content Planner', icon: Calendar, roles: ['Admin', 'Manager', 'Editor'] },
   { href: '/content-creation', label: 'Post Composer', icon: PenSquare, roles: ['Admin', 'Manager', 'Editor'] },
   { href: '/ai-content-creator', label: 'AI Content Creator', icon: Sparkles, roles: ['Admin', 'Manager', 'Editor'] },
+  { href: '/risk-check', label: 'AI Risk Check', icon: ShieldCheck, roles: ['Admin', 'Manager', 'Editor'] },
   { href: '/inbox', label: 'Inbox', icon: Inbox, roles: ['Admin', 'Manager', 'Editor'], badge: 5 },
   { href: '/mentions', label: 'Mentions', icon: AtSign, roles: ['Admin', 'Manager', 'Editor'] },
   { href: '/analytics', label: 'Analytics', icon: BarChart2, roles: ['Admin', 'Manager'] },
