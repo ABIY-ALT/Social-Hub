@@ -23,7 +23,19 @@ export default function SettingsLayout({
                 <Link href="/settings/accounts">Social Accounts</Link>
               </TabsTrigger>
               <TabsTrigger value="/settings/team" asChild className="justify-start data-[state=active]:bg-muted data-[state=active]:shadow-none">
-                <Link href="/settings/team">Team</Link>
+                <Link href="/settings/team">Team & Roles</Link>
+              </TabsTrigger>
+               <TabsTrigger value="/settings/brand" asChild className="justify-start data-[state=active]:bg-muted data-[state=active]:shadow-none">
+                <Link href="/settings/brand">Brand Guidelines</Link>
+              </TabsTrigger>
+              <TabsTrigger value="/settings/ai" asChild className="justify-start data-[state=active]:bg-muted data-[state=active]:shadow-none">
+                <Link href="/settings/ai">AI Rules</Link>
+              </TabsTrigger>
+              <TabsTrigger value="/settings/notifications" asChild className="justify-start data-[state=active]:bg-muted data-[state=active]:shadow-none">
+                <Link href="/settings/notifications">Notifications</Link>
+              </TabsTrigger>
+              <TabsTrigger value="/settings/security" asChild className="justify-start data-[state=active]:bg-muted data-[state=active]:shadow-none">
+                <Link href="/settings/security">Security</Link>
               </TabsTrigger>
             </TabsList>
           </Tabs>
