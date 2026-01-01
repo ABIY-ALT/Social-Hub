@@ -33,7 +33,7 @@ import { useToast } from '@/hooks/use-toast';
 import { bankLogo } from '@/lib/placeholder-images';
 
 const loginSchema = z.object({
-  username: z.string().min(1, 'Username or Phone Number is required'),
+  username: z.string().regex(/^\d{10}$/, 'Please enter a valid 10-digit phone number.'),
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters long'),
@@ -62,11 +62,11 @@ export default function LoginPage() {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    if (data.username !== 'admin' || data.password !== 'password123') {
+    if (data.username !== '0912345678' || data.password !== 'password123') {
         toast({
             variant: "destructive",
             title: "Login Failed",
-            description: "Invalid username or password. Please try again.",
+            description: "Invalid phone number or password. Please try again.",
         });
         setIsLoading(false);
         return;
@@ -110,10 +110,10 @@ export default function LoginPage() {
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Username or Phone Number</FormLabel>
+                      <FormLabel>Phone Number</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter your username or phone number"
+                          placeholder="Enter your phone number"
                           {...field}
                           disabled={isLoading}
                         />
