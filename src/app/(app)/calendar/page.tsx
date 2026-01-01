@@ -177,7 +177,7 @@ const SchedulePostForm = ({ onPostCreate, onDone }: { onPostCreate: (post: Omit<
   });
 
   function onSubmit(values: z.infer<typeof schedulePostSchema>) {
-    onPostCreate(values);
+    onPostCreate(values as any);
     form.reset();
     onDone();
   }
