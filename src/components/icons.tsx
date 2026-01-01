@@ -20,9 +20,8 @@ export function InstagramIcon(props: SVGProps<SVGSVGElement>) {
 
 export function XIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
+    <svg {...props} fill="currentColor" viewBox="0 0 300 271">
+        <path d="M236 0h46L181 115l118 156h-92.6l-72-95-59 95H0l104-149L0 0h95l59 86 62-86zM214 243L78 28h22l136 193h-22z"></path>
     </svg>
   );
 }
@@ -39,9 +38,10 @@ export function LinkedInIcon(props: SVGProps<SVGSVGElement>) {
 
 export function TikTokIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 12a4 4 0 1 0 4 4V4" />
-      <path d="M16 4h-4a4 4 0 1 0 0 8h4" />
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16.6 5.82h2.75v6.75a4.34 4.34 0 0 1-4.33 4.33h-1.41v-2.75h1.41a1.59 1.59 0 0 0 1.58-1.58V5.82z"/>
+        <path d="M9.05 12.47H6.3v- filedea1.59 1.59 0 0 0-1.58-1.58H3.31v6.75a4.34 4.34 0 0 0 4.33 4.33H9.05v-2.75H7.64a1.59 1.59 0 0 1-1.58-1.58v-1.41h2.99v-2.75z"/>
+        <path d="M16.6 5.82h-2.99V9a.21.21 0 0 1-.21.21h-2.75V3.31h2.75a4.34 4.34 0 0 1 4.33 4.33v.97a.21.21 0 0 0 .21.21h2.75V5.82h-4.13z"/>
     </svg>
   );
 }
