@@ -24,12 +24,30 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -120,9 +138,43 @@ export default function TeamAndApprovalsPage() {
                             Manage your team and their roles.
                             </CardDescription>
                         </div>
-                        <Button>
-                            <Plus className="mr-2 h-4 w-4" /> Invite Member
-                        </Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button>
+                                <Plus className="mr-2 h-4 w-4" /> Invite Member
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Invite a new team member</DialogTitle>
+                                <DialogDescription>
+                                    Enter the email address and assign a role to invite someone to your team.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="email" className="text-right">Email</Label>
+                                    <Input id="email" type="email" placeholder="name@example.com" className="col-span-3" />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="role" className="text-right">Role</Label>
+                                    <Select defaultValue="Editor">
+                                        <SelectTrigger id="role" className="col-span-3">
+                                            <SelectValue placeholder="Select a role" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Admin">Admin</SelectItem>
+                                            <SelectItem value="Editor">Editor</SelectItem>
+                                            <SelectItem value="Viewer">Viewer</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button type="submit">Send Invitation</Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
                     </div>
                 </CardHeader>
                 <CardContent>
