@@ -24,7 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { socialIcons } from '@/components/icons';
-import type { SocialAccount } from '@/lib/types';
+import type { SocialAccount, InboxMessage } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 
 const connectedAccounts: SocialAccount[] = [
@@ -41,6 +41,47 @@ const recentActivities = [
     { id: 3, icon: MessageSquareIcon, text: "New comment on your Facebook post 'Summer Sale'.", time: "3h ago" },
     { id: 4, icon: FilePlus, text: "You scheduled a new post for X.", time: "8h ago" },
 ];
+
+const mockMessages: InboxMessage[] = [
+  {
+    id: "1", platform: "Instagram", type: "comment",
+    sender: { name: "alex_design", avatar: "https://picsum.photos/seed/101/40/40" },
+    content: "This looks amazing! Can't wait to try it out. 🔥",
+    timestamp: "2 hours ago",
+    unread: true,
+  },
+  {
+    id: "2", platform: "X", type: "message",
+    sender: { name: "MarketingMaven", avatar: "https://picsum.photos/seed/102/40/40" },
+    content: "Hi, I'm interested in a collaboration. Could you please share your media kit?",
+    timestamp: "5 hours ago",
+    unread: true,
+  },
+  {
+    id: "3", platform: "Facebook", type: "comment",
+    sender: { name: "John Smith", avatar: "https://picsum.photos/seed/103/40/40" },
+    content: "What is the price for the premium plan?",
+    timestamp: "1 day ago",
+    unread: false,
+  },
+  {
+    id: "4", platform: "LinkedIn", type: "message",
+    sender: { name: "Jane Doe, CEO at Innovate Inc.", avatar: "https://picsum.photos/seed/104/40/40" },
+    content: "Great work on your recent launch. I'd love to connect and discuss potential synergies.",
+    timestamp: "2 days ago",
+    unread: false,
+  },
+  {
+    id: "5", platform: "TikTok", type: "comment",
+    sender: { name: "user12345678", avatar: "https://picsum.photos/seed/105/40/40" },
+    content: "this is sickkkk 🤘",
+    timestamp: "3 days ago",
+    unread: true,
+  },
+];
+
+const pendingApprovalsCount = 3;
+const unreadMessagesCount = mockMessages.filter(m => m.unread).length;
 
 
 export default function DashboardPage() {
@@ -79,7 +120,7 @@ export default function DashboardPage() {
             <MessageSquareWarning className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3</div>
+            <div className="text-2xl font-bold">{pendingApprovalsCount}</div>
             <p className="text-xs text-muted-foreground">posts awaiting review</p>
           </CardContent>
         </Card>
@@ -89,7 +130,7 @@ export default function DashboardPage() {
             <MessageCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5</div>
+            <div className="text-2xl font-bold">{unreadMessagesCount}</div>
             <p className="text-xs text-muted-foreground">in your inbox</p>
           </CardContent>
         </Card>

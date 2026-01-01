@@ -9,6 +9,7 @@ import {
   User,
   MoreVertical,
   CheckCircle2,
+  Inbox,
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
