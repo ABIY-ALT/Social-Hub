@@ -1,17 +1,16 @@
 
-
 "use client";
 
 import React from "react";
 import {
   Plus,
   MoreHorizontal,
-  FileCheck,
   FileClock,
   MessageSquare,
   History,
   CheckCircle,
   XCircle,
+  Shield,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -63,6 +62,12 @@ const activityLog = [
     { id: 'a4', actor: 'Diana Miller', action: 'commented on the "Black Friday" post.', time: '4h ago', icon: MessageSquare },
     { id: 'a5', actor: 'Diana Miller', action: 'submitted a new post for approval.', time: '5h ago', icon: FileClock },
 ];
+
+const mockRoles = [
+    { name: "Admin", description: "Full access to all features and settings." },
+    { name: "Editor", description: "Can create, edit, and schedule posts. Cannot change settings." },
+    { name: "Viewer", description: "Can only view content and analytics. Cannot make changes." },
+]
 
 export default function TeamAndApprovalsPage() {
   return (
@@ -171,6 +176,43 @@ export default function TeamAndApprovalsPage() {
                         </TableRow>
                         ))}
                     </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+             <Card>
+                <CardHeader>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <CardTitle className="flex items-center gap-2"><Shield className="h-5 w-5 text-primary" /> Role Management</CardTitle>
+                            <CardDescription>
+                            Define roles and their permissions.
+                            </CardDescription>
+                        </div>
+                        <Button variant="outline">
+                            <Plus className="mr-2 h-4 w-4" /> Create Role
+                        </Button>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                     <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Role</TableHead>
+                                <TableHead>Description</TableHead>
+                                <TableHead><span className="sr-only">Actions</span></TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {mockRoles.map((role) => (
+                                <TableRow key={role.name}>
+                                    <TableCell className="font-medium">{role.name}</TableCell>
+                                    <TableCell className="text-muted-foreground">{role.description}</TableCell>
+                                    <TableCell className="text-right">
+                                        <Button variant="ghost" size="sm">Edit</Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
                     </Table>
                 </CardContent>
             </Card>

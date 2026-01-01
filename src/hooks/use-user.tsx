@@ -5,7 +5,7 @@ import type { User, UserRole } from '@/lib/types';
 
 interface UserContextType {
   user: User;
-  setUserRole: (role: UserRole) => void;
+  // setUserRole is no longer needed as role switching is removed
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -13,11 +13,10 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User>({ name: 'Alex', role: 'Admin' });
 
-  const setUserRole = (role: UserRole) => {
-    setUser(prevUser => ({ ...prevUser, role }));
-  };
+  // The ability to set user role is removed from the public context
+  // It will be managed through proper settings pages in a real app
   
-  const value = useMemo(() => ({ user, setUserRole }), [user]);
+  const value = useMemo(() => ({ user }), [user]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }

@@ -73,7 +73,7 @@ const settingsItem = {
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { user, setUserRole } = useUser();
+  const { user } = useUser();
 
   const isActive = (href: string) => {
     if (href === '/dashboard') {
@@ -118,26 +118,15 @@ export function AppSidebar() {
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start gap-2 p-2 h-auto text-sm">
-                  <Avatar className="h-7 w-7">
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col items-start">
-                    <span className="font-medium">{user.name}</span>
-                    <span className="text-xs text-muted-foreground">{user.role}</span>
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 mb-2" side="top" align="start">
-                <DropdownMenuLabel>Change Role</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setUserRole('Admin')}>Admin</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setUserRole('Manager')}>Manager</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setUserRole('Editor')}>Editor</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex w-full items-center gap-2 rounded-md p-2 text-left text-sm">
+              <Avatar className="h-7 w-7">
+                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col items-start">
+                <span className="font-medium">{user.name}</span>
+                <span className="text-xs text-muted-foreground">{user.role}</span>
+              </div>
+            </div>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
