@@ -1,3 +1,10 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "bank-logo",
+      "description": "The official logo for the bank.",
+      "imageUrl": "/bank-logo.png",
+      "imageHint": "bank logo"
+    }
+  ]
 }

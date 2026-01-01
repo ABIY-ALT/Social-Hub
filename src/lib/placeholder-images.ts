@@ -8,3 +8,5 @@ export type ImagePlaceholder = {
 };
 
 export const PlaceHolderImages: ImagePlaceholder[] = data.placeholderImages;
+
+export const bankLogo = data.placeholderImages.find(img => img.id === 'bank-logo')!;
