@@ -13,7 +13,7 @@ import {
   Link2,
 } from 'lucide-react';
 import { AreaChart, Area, CartesianGrid, XAxis, ResponsiveContainer, Tooltip } from "recharts";
-import { format } from 'date-fns';
+import { format, subDays, addDays } from 'date-fns';
 
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
@@ -25,15 +25,21 @@ import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { useUser } from '@/hooks/use-user';
 import { cn } from '@/lib/utils';
 
-const chartData = [
-  { date: "2024-07-01", engagement: 250, impressions: 15000 },
-  { date: "2024-07-02", engagement: 300, impressions: 18000 },
-  { date: "2024-07-03", engagement: 200, impressions: 12000 },
-  { date: "2024-07-04", engagement: 450, impressions: 25000 },
-  { date: "2024-07-05", engagement: 350, impressions: 22000 },
-  { date: "2024-07-06", engagement: 600, impressions: 30000 },
-  { date: "2024-07-07", engagement: 400, impressions: 26000 },
-];
+const generateChartData = (days: number) => {
+  const data = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const date = subDays(new Date(), i);
+    data.push({
+      date: date.toISOString().split('T')[0],
+      engagement: Math.floor(Math.random() * 500) + 100,
+      impressions: Math.floor(Math.random() * 20000) + 5000,
+    });
+  }
+  return data;
+}
+
+const weeklyData = generateChartData(7);
+const monthlyData = generateChartData(30);
 
 const chartConfig = {
   engagement: {
@@ -63,6 +69,11 @@ const recentPosts = [
 
 export default function DashboardPage() {
     const { user } = useUser();
+    const [timeRange, setTimeRange] = React.useState<'week' | 'month'>('week');
+
+    const chartData = timeRange === 'week' ? weeklyData : monthlyData;
+    const descriptionText = timeRange === 'week' ? 'Engagement vs Impressions over the last 7 days' : 'Engagement vs Impressions over the last 30 days';
+
   return (
     <>
       <div className="mb-6">
@@ -126,11 +137,11 @@ export default function DashboardPage() {
                 <CardHeader className="flex flex-row items-center justify-between">
                     <div>
                         <CardTitle>Audience Growth</CardTitle>
-                        <CardDescription>Engagement vs Impressions over the last 7 days</CardDescription>
+                        <CardDescription>{descriptionText}</CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Button variant="secondary" size="sm">Week</Button>
-                        <Button variant="ghost" size="sm">Month</Button>
+                        <Button variant={timeRange === 'week' ? 'secondary' : 'ghost'} size="sm" onClick={() => setTimeRange('week')}>Week</Button>
+                        <Button variant={timeRange === 'month' ? 'secondary' : 'ghost'} size="sm" onClick={() => setTimeRange('month')}>Month</Button>
                     </div>
                 </CardHeader>
                 <CardContent>
@@ -153,7 +164,7 @@ export default function DashboardPage() {
                                   tickLine={false}
                                   axisLine={false}
                                   tickMargin={8}
-                                  tickFormatter={(value) => format(new Date(value), "E")}
+                                  tickFormatter={(value) => format(new Date(value), timeRange === 'week' ? "E" : "MMM d")}
                                 />
                                 <Tooltip content={<ChartTooltipContent />} />
                                 <Area type="monotone" dataKey="impressions" stroke="var(--color-impressions)" fillOpacity={1} fill="url(#colorImpressions)" strokeWidth={2} />
