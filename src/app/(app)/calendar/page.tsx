@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import React, { useState } from "react";
@@ -169,6 +170,7 @@ const schedulePostSchema = z.object({
 });
 
 const SchedulePostForm = ({ onPostCreate, onDone }: { onPostCreate: (post: Omit<Post, 'id' | 'status'>) => void; onDone: () => void; }) => {
+  const [isDatePickerOpen, setDatePickerOpen] = useState(false);
   const form = useForm<z.infer<typeof schedulePostSchema>>({
     resolver: zodResolver(schedulePostSchema),
     defaultValues: {
@@ -239,7 +241,7 @@ const SchedulePostForm = ({ onPostCreate, onDone }: { onPostCreate: (post: Omit<
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Schedule Date</FormLabel>
-                <Popover>
+                <Popover open={isDatePickerOpen} onOpenChange={setDatePickerOpen}>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
@@ -262,7 +264,10 @@ const SchedulePostForm = ({ onPostCreate, onDone }: { onPostCreate: (post: Omit<
                     <Calendar
                       mode="single"
                       selected={field.value}
-                      onSelect={field.onChange}
+                      onSelect={(date) => {
+                        field.onChange(date);
+                        setDatePickerOpen(false);
+                      }}
                       disabled={(date) => date < new Date("1900-01-01")}
                       initialFocus
                     />
