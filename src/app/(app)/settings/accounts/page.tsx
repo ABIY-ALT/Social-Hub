@@ -15,6 +15,7 @@ import type { SocialAccount, SocialPlatform } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Settings, Shield } from "lucide-react";
 
+// NOTE: In a real app, this connection state would be fetched from your database.
 const initialAccounts: SocialAccount[] = [
   {
     id: "fb",
@@ -23,6 +24,7 @@ const initialAccounts: SocialAccount[] = [
     avatar: "",
     isConnected: false,
     Icon: socialIcons.Facebook,
+    authUrl: "/api/auth/facebook/start" // Placeholder for your backend endpoint
   },
   {
     id: "ig",
@@ -39,6 +41,7 @@ const initialAccounts: SocialAccount[] = [
     avatar: "",
     isConnected: true,
     Icon: socialIcons.X,
+    authUrl: "/api/auth/twitter/start"
   },
   {
     id: "li",
@@ -47,6 +50,7 @@ const initialAccounts: SocialAccount[] = [
     avatar: "",
     isConnected: false,
     Icon: socialIcons.LinkedIn,
+    authUrl: "/api/auth/linkedin/start"
   },
   {
     id: "tt",
@@ -55,6 +59,7 @@ const initialAccounts: SocialAccount[] = [
     avatar: "",
     isConnected: false,
     Icon: socialIcons.TikTok,
+    authUrl: "/api/auth/tiktok/start"
   },
   {
     id: "yt",
@@ -68,12 +73,22 @@ const initialAccounts: SocialAccount[] = [
 
 const AccountCard = ({
   account,
-  onToggle,
 }: {
-  account: SocialAccount;
-  onToggle: (id: string) => void;
+  account: SocialAccount & { authUrl?: string };
 }) => {
   const PlatformIcon = socialIcons[account.platform];
+
+  const handleConnect = () => {
+    if (account.authUrl) {
+      // This redirects the user to your backend to start the OAuth flow.
+      window.location.href = account.authUrl;
+    }
+  };
+
+  const handleDisconnect = () => {
+    // In a real app, this would call a backend endpoint to revoke the token.
+    alert(`Disconnecting ${account.platform} is not implemented in this prototype.`);
+  };
 
   return (
     <Card className="flex flex-col">
@@ -94,13 +109,24 @@ const AccountCard = ({
         </p>
       </CardContent>
       <CardFooter className="flex flex-col sm:flex-row gap-2">
-        <Button
-          className="w-full"
-          variant={account.isConnected ? "destructive" : "default"}
-          onClick={() => onToggle(account.id)}
-        >
-          {account.isConnected ? "Disconnect" : "Connect"}
-        </Button>
+        {account.isConnected ? (
+           <Button
+              className="w-full"
+              variant="destructive"
+              onClick={handleDisconnect}
+            >
+              Disconnect
+            </Button>
+        ) : (
+            <Button
+              className="w-full"
+              variant="default"
+              onClick={handleConnect}
+              disabled={!account.authUrl}
+            >
+              Connect
+            </Button>
+        )}
         {account.isConnected && (
             <Button className="w-full" variant="outline">
                 <Settings className="mr-2 h-4 w-4" />
@@ -113,27 +139,12 @@ const AccountCard = ({
 };
 
 export default function SocialAccountsPage() {
+  // In a real app, you'd fetch account status from your backend, not use static state.
   const [accounts, setAccounts] = useState(initialAccounts);
   const [filter, setFilter] = useState<"all" | "connected" | "disconnected">(
     "all"
   );
-
-  const toggleConnection = (id: string) => {
-    setAccounts((prev) =>
-      prev.map((acc) =>
-        acc.id === id
-          ? {
-              ...acc,
-              isConnected: !acc.isConnected,
-              username: !acc.isConnected
-                ? `@${"social_user"}`
-                : "Not Connected",
-            }
-          : acc
-      )
-    );
-  };
-
+  
   const filteredAccounts = accounts.filter((account) => {
     if (filter === "all") return true;
     if (filter === "connected") return account.isConnected;
@@ -167,11 +178,10 @@ export default function SocialAccountsPage() {
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredAccounts.map((account) => (
-            <AccountCard
-                key={account.id}
-                account={account}
-                onToggle={toggleConnection}
-            />
+              <AccountCard
+                  key={account.id}
+                  account={account}
+              />
             ))}
         </div>
         <Card className="mt-6">

@@ -1,3 +1,4 @@
+
 import type { LucideIcon } from "lucide-react";
 
 export type SocialPlatform = "Facebook" | "Instagram" | "X" | "LinkedIn" | "TikTok" | "YouTube";
@@ -9,6 +10,7 @@ export type SocialAccount = {
   avatar: string;
   isConnected: boolean;
   Icon: React.ElementType;
+  authUrl?: string;
 };
 
 export type InboxMessage = {
