@@ -15,7 +15,7 @@ import {
   subMonths,
   isSameDay,
 } from "date-fns";
-import { ChevronLeft, ChevronRight, Plus, MoreHorizontal } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, MoreHorizontal, Calendar as CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -178,6 +178,7 @@ const SchedulePostForm = ({ onPostCreate, onDone }: { onPostCreate: (post: Omit<
 
   function onSubmit(values: z.infer<typeof schedulePostSchema>) {
     onPostCreate(values);
+    form.reset();
     onDone();
   }
 
@@ -252,7 +253,7 @@ const SchedulePostForm = ({ onPostCreate, onDone }: { onPostCreate: (post: Omit<
                         ) : (
                           <span>Pick a date</span>
                         )}
-                        <MoreHorizontal className="ml-auto h-4 w-4 opacity-50" />
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
@@ -373,4 +374,3 @@ export default function ContentPlannerPage() {
     </>
   );
 }
-
