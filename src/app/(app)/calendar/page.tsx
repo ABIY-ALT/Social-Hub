@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from "react";
@@ -12,8 +13,12 @@ import {
   isToday,
   addMonths,
   subMonths,
+  isSameDay,
 } from "date-fns";
 import { ChevronLeft, ChevronRight, Plus, MoreHorizontal } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
@@ -32,12 +37,28 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { socialIcons } from "@/components/icons";
+import type { SocialPlatform } from "@/lib/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
 
 type PostStatus = "Draft" | "Scheduled" | "Published" | "Failed";
 type Post = {
@@ -49,7 +70,7 @@ type Post = {
     scheduledAt: Date;
 }
 
-const mockPosts: Post[] = [
+const initialMockPosts: Post[] = [
   { id: "1", title: "New Product Launch", platform: "Instagram", status: "Scheduled", content: "Our new product is launching soon!", scheduledAt: new Date("2024-08-05T10:00:00") },
   { id: "2", title: "Weekly Q&A", platform: "X", status: "Published", content: "Join us for our weekly Q&A session.", scheduledAt: new Date("2024-08-12T14:00:00") },
   { id: "3", title: "Blog Post Promo", platform: "LinkedIn", status: "Scheduled", content: "Check out our latest blog post on industry trends.", scheduledAt: new Date("2024-08-12T16:00:00") },
@@ -140,14 +161,143 @@ const Day = ({ day, isCurrentMonth, isToday, posts }: { day: Date, isCurrentMont
   </div>
 );
 
+const schedulePostSchema = z.object({
+  title: z.string().min(1, "Title is required."),
+  content: z.string().min(1, "Content is required."),
+  platform: z.enum(["Facebook", "Instagram", "X", "LinkedIn", "TikTok", "YouTube"]),
+  scheduledAt: z.date({ required_error: "A date is required." }),
+});
+
+const SchedulePostForm = ({ onPostCreate, onDone }: { onPostCreate: (post: Omit<Post, 'id' | 'status'>) => void; onDone: () => void; }) => {
+  const form = useForm<z.infer<typeof schedulePostSchema>>({
+    resolver: zodResolver(schedulePostSchema),
+    defaultValues: {
+      platform: "Instagram",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof schedulePostSchema>) {
+    onPostCreate(values);
+    onDone();
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g. New Product Launch" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="content"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Content</FormLabel>
+              <FormControl>
+                <Textarea placeholder="Write your post content here..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="platform"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Platform</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a platform" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {Object.keys(socialIcons).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="scheduledAt"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Schedule Date</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <MoreHorizontal className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <DialogFooter className="mt-4">
+          <Button type="submit">Schedule</Button>
+        </DialogFooter>
+      </form>
+    </Form>
+  )
+}
+
 export default function ContentPlannerPage() {
   const [currentDate, setCurrentDate] = useState(new Date("2024-08-01"));
   const [view, setView] = useState<"Monthly" | "Weekly" | "Daily">("Monthly");
+  const [posts, setPosts] = useState<Post[]>(initialMockPosts);
+  const [isScheduleDialogOpen, setScheduleDialogOpen] = useState(false);
 
   const start = startOfWeek(startOfMonth(currentDate), { weekStartsOn: 0 });
   const end = endOfWeek(endOfMonth(currentDate), { weekStartsOn: 0 });
   const days = eachDayOfInterval({ start, end });
   const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  const handleCreatePost = (newPostData: Omit<Post, 'id' | 'status'>) => {
+    const newPost: Post = {
+        ...newPostData,
+        id: crypto.randomUUID(),
+        status: "Scheduled",
+    };
+    setPosts(prev => [...prev, newPost]);
+  }
 
   return (
     <>
@@ -178,7 +328,7 @@ export default function ContentPlannerPage() {
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
-        <Dialog>
+        <Dialog open={isScheduleDialogOpen} onOpenChange={setScheduleDialogOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
@@ -192,19 +342,7 @@ export default function ContentPlannerPage() {
                 Fill in the details for your new social media post.
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="title" className="text-right">Title</Label>
-                    <Input id="title" placeholder="e.g. New Product Launch" className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="content" className="text-right">Content</Label>
-                    <Textarea id="content" placeholder="Write your post content here..." className="col-span-3" />
-                </div>
-            </div>
-            <DialogFooter>
-                <Button type="submit">Schedule</Button>
-            </DialogFooter>
+            <SchedulePostForm onPostCreate={handleCreatePost} onDone={() => setScheduleDialogOpen(false)} />
           </DialogContent>
         </Dialog>
       </Header>
@@ -219,7 +357,7 @@ export default function ContentPlannerPage() {
         </div>
         <div className="grid grid-cols-7">
           {days.map((day) => {
-            const todaysPosts = mockPosts.filter(p => format(p.scheduledAt, "yyyy-MM-dd") === format(day, "yyyy-MM-dd"));
+            const todaysPosts = posts.filter(p => isSameDay(p.scheduledAt, day));
             return (
                 <Day
                 key={day.toString()}
@@ -235,3 +373,4 @@ export default function ContentPlannerPage() {
     </>
   );
 }
+
