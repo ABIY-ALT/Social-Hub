@@ -12,7 +12,7 @@ import {
   PlusCircle,
   Link2,
 } from 'lucide-react';
-import { Bar, BarChart, CartesianGrid, XAxis, ResponsiveContainer } from "recharts";
+import { AreaChart, Area, CartesianGrid, XAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { format } from 'date-fns';
 
 import { Header } from '@/components/layout/header';
@@ -21,7 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { socialIcons } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { useUser } from '@/hooks/use-user';
 import { cn } from '@/lib/utils';
 
@@ -38,11 +38,11 @@ const chartData = [
 const chartConfig = {
   engagement: {
     label: "Engagement",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(var(--chart-2))",
   },
   impressions: {
     label: "Impressions",
-    color: "hsl(var(--chart-2))",
+    color: "hsl(var(--chart-1))",
   },
 };
 
@@ -136,21 +136,29 @@ export default function DashboardPage() {
                 <CardContent>
                     <ChartContainer config={chartConfig} className="h-[250px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 0 }}>
-                                <CartesianGrid vertical={false} />
+                            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="colorEngagement" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="var(--color-engagement)" stopOpacity={0.4}/>
+                                        <stop offset="95%" stopColor="var(--color-engagement)" stopOpacity={0.1}/>
+                                    </linearGradient>
+                                    <linearGradient id="colorImpressions" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="var(--color-impressions)" stopOpacity={0.4}/>
+                                        <stop offset="95%" stopColor="var(--color-impressions)" stopOpacity={0.1}/>
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid vertical={false} strokeDasharray="3 3" />
                                 <XAxis
-                                dataKey="date"
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={8}
-                                tickFormatter={(value) => format(new Date(value), "MMM d")}
+                                  dataKey="date"
+                                  tickLine={false}
+                                  axisLine={false}
+                                  tickMargin={8}
+                                  tickFormatter={(value) => format(new Date(value), "E")}
                                 />
-                                <ChartTooltip
-                                cursor={false}
-                                content={<ChartTooltipContent />}
-                                />
-                                <Bar dataKey="engagement" fill="var(--color-engagement)" radius={4} />
-                            </BarChart>
+                                <Tooltip content={<ChartTooltipContent />} />
+                                <Area type="monotone" dataKey="impressions" stroke="var(--color-impressions)" fillOpacity={1} fill="url(#colorImpressions)" strokeWidth={2} />
+                                <Area type="monotone" dataKey="engagement" stroke="var(--color-engagement)" fillOpacity={1} fill="url(#colorEngagement)" strokeWidth={2} />
+                            </AreaChart>
                         </ResponsiveContainer>
                     </ChartContainer>
                 </CardContent>
