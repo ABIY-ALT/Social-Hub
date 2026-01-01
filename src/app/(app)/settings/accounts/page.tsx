@@ -8,12 +8,15 @@ import {
   CardTitle,
   CardContent,
   CardFooter,
+  CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { socialIcons } from "@/components/icons";
 import type { SocialAccount, SocialPlatform } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Settings, Shield } from "lucide-react";
+import { ExternalLink, Settings, Shield, Link as LinkIcon, AlertTriangle } from "lucide-react";
+import Link from "next/link";
+
 
 // NOTE: In a real app, this connection state would be fetched from your database.
 const initialAccounts: SocialAccount[] = [
@@ -24,7 +27,7 @@ const initialAccounts: SocialAccount[] = [
     avatar: "",
     isConnected: false,
     Icon: socialIcons.Facebook,
-    authUrl: "/api/auth/facebook/start" // Placeholder for your backend endpoint
+    authUrl: "/api/auth/facebook" 
   },
   {
     id: "ig",
@@ -41,7 +44,7 @@ const initialAccounts: SocialAccount[] = [
     avatar: "",
     isConnected: true,
     Icon: socialIcons.X,
-    authUrl: "/api/auth/twitter/start"
+    authUrl: "/api/auth/twitter"
   },
   {
     id: "li",
@@ -50,7 +53,7 @@ const initialAccounts: SocialAccount[] = [
     avatar: "",
     isConnected: false,
     Icon: socialIcons.LinkedIn,
-    authUrl: "/api/auth/linkedin/start"
+    authUrl: "/api/auth/linkedin"
   },
   {
     id: "tt",
@@ -59,7 +62,7 @@ const initialAccounts: SocialAccount[] = [
     avatar: "",
     isConnected: false,
     Icon: socialIcons.TikTok,
-    authUrl: "/api/auth/tiktok/start"
+    authUrl: "/api/auth/tiktok"
   },
   {
     id: "yt",
@@ -73,21 +76,23 @@ const initialAccounts: SocialAccount[] = [
 
 const AccountCard = ({
   account,
+  onConnect,
+  onDisconnect,
 }: {
-  account: SocialAccount & { authUrl?: string };
+  account: SocialAccount;
+  onConnect: (platform: SocialPlatform) => void;
+  onDisconnect: (platform: SocialPlatform) => void;
 }) => {
   const PlatformIcon = socialIcons[account.platform];
 
   const handleConnect = () => {
     if (account.authUrl) {
-      // This redirects the user to your backend to start the OAuth flow.
-      window.location.href = account.authUrl;
+      onConnect(account.platform);
     }
   };
 
   const handleDisconnect = () => {
-    // In a real app, this would call a backend endpoint to revoke the token.
-    alert(`Disconnecting ${account.platform} is not implemented in this prototype.`);
+    onDisconnect(account.platform);
   };
 
   return (
@@ -124,6 +129,7 @@ const AccountCard = ({
               onClick={handleConnect}
               disabled={!account.authUrl}
             >
+             <LinkIcon className="mr-2 h-4 w-4" />
               Connect
             </Button>
         )}
@@ -139,11 +145,18 @@ const AccountCard = ({
 };
 
 export default function SocialAccountsPage() {
-  // In a real app, you'd fetch account status from your backend, not use static state.
   const [accounts, setAccounts] = useState(initialAccounts);
   const [filter, setFilter] = useState<"all" | "connected" | "disconnected">(
     "all"
   );
+  
+  const handleConnect = (platform: SocialPlatform) => {
+    setAccounts(prev => prev.map(acc => acc.platform === platform ? { ...acc, isConnected: true, username: `@${platform.toLowerCase()}_user` } : acc));
+  };
+  
+  const handleDisconnect = (platform: SocialPlatform) => {
+    setAccounts(prev => prev.map(acc => acc.platform === platform ? { ...acc, isConnected: false, username: 'Not Connected' } : acc));
+  };
   
   const filteredAccounts = accounts.filter((account) => {
     if (filter === "all") return true;
@@ -153,57 +166,64 @@ export default function SocialAccountsPage() {
 
   return (
     <div>
-        <div className="flex items-center gap-2 mb-4">
-            <Badge
-            variant={filter === "all" ? "default" : "secondary"}
-            onClick={() => setFilter("all")}
-            className="cursor-pointer"
-            >
-            All
-            </Badge>
-            <Badge
-            variant={filter === "connected" ? "default" : "secondary"}
-            onClick={() => setFilter("connected")}
-            className="cursor-pointer"
-            >
-            Connected
-            </Badge>
-            <Badge
-            variant={filter === "disconnected" ? "default" : "secondary"}
-            onClick={() => setFilter("disconnected")}
-            className="cursor-pointer"
-            >
-            Disconnected
-            </Badge>
-        </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredAccounts.map((account) => (
-              <AccountCard
-                  key={account.id}
-                  account={account}
-              />
-            ))}
-        </div>
-        <Card className="mt-6">
+        <Card className="mb-6">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <Shield className="h-5 w-5"/>
-                    <span>Security & Access Control</span>
+                    <LinkIcon className="h-5 w-5 text-primary"/>
+                    <span>Connected Accounts</span>
                 </CardTitle>
+                <CardDescription>
+                    Manage the social media accounts linked to your workspace.
+                </CardDescription>
             </CardHeader>
             <CardContent>
-                <p className="text-sm text-muted-foreground">
-                    Your account security is our top priority. We use industry-standard protocols to ensure your data is safe.
-                    You can manage which team members have access to each social account from the Team settings page.
-                </p>
+                <div className="flex items-center gap-2 mb-4">
+                    <Badge
+                    variant={filter === "all" ? "default" : "secondary"}
+                    onClick={() => setFilter("all")}
+                    className="cursor-pointer"
+                    >
+                    All
+                    </Badge>
+                    <Badge
+                    variant={filter === "connected" ? "default" : "secondary"}
+                    onClick={() => setFilter("connected")}
+                    className="cursor-pointer"
+                    >
+                    Connected
+                    </Badge>
+                    <Badge
+                    variant={filter === "disconnected" ? "default" : "secondary"}
+                    onClick={() => setFilter("disconnected")}
+                    className="cursor-pointer"
+                    >
+                    Disconnected
+                    </Badge>
+                </div>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {filteredAccounts.map((account) => (
+                      <AccountCard
+                          key={account.id}
+                          account={account}
+                          onConnect={handleConnect}
+                          onDisconnect={handleDisconnect}
+                      />
+                    ))}
+                </div>
             </CardContent>
-            <CardFooter>
-                <Button variant="outline" asChild>
-                    <a href="/settings/team">
-                        Manage Team Permissions <ExternalLink className="ml-2 h-4 w-4"/>
-                    </a>
-                </Button>
-            </CardFooter>
+        </Card>
+        <Card className="mt-6 bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800">
+            <CardHeader className="flex flex-row items-start gap-4">
+                <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-1"/>
+                <div>
+                    <CardTitle className="text-yellow-800 dark:text-yellow-200">
+                        Developer Note: Simulated OAuth Flow
+                    </CardTitle>
+                    <CardDescription className="text-yellow-700 dark:text-yellow-300">
+                        The connect/disconnect buttons currently simulate the flow locally. To enable a real OAuth flow, you must implement a backend (e.g., Firebase Functions) and replace the `authUrl` in this component with your function URLs.
+                    </CardDescription>
+                </div>
+            </CardHeader>
         </Card>
     </div>
   );

@@ -1,5 +1,6 @@
-// This page is intentionally left blank.
-// The /settings layout file handles the rendering of the default settings tab.
+// This page is now the main entry point for the settings layout.
+// The actual content (the grid of cards) is defined within settings/layout.tsx
+// based on the current path.
 export default function SettingsPage() {
   return null;
 }

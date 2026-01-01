@@ -51,8 +51,7 @@ type MenuItem = {
 
 const menuItems: MenuItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['Admin', 'Manager', 'Editor'] },
-  { href: '/accounts', label: 'Social Accounts', icon: Users, roles: ['Admin', 'Manager'] },
-  { href: '/planner', label: 'Content Planner', icon: Calendar, roles: ['Admin', 'Manager', 'Editor'] },
+  { href: '/calendar', label: 'Content Planner', icon: Calendar, roles: ['Admin', 'Manager', 'Editor'] },
   { href: '/content-creation', label: 'Post Composer', icon: PenSquare, roles: ['Admin', 'Manager', 'Editor'] },
   { href: '/ai-content-creator', label: 'AI Content Creator', icon: Sparkles, roles: ['Admin', 'Manager', 'Editor'] },
   { href: '/risk-check', label: 'AI Risk Check', icon: ShieldCheck, roles: ['Admin', 'Manager', 'Editor'] },
@@ -60,7 +59,6 @@ const menuItems: MenuItem[] = [
   { href: '/mentions', label: 'Mentions', icon: AtSign, roles: ['Admin', 'Manager', 'Editor'] },
   { href: '/analytics', label: 'Analytics', icon: BarChart2, roles: ['Admin', 'Manager'] },
   { href: '/campaigns', label: 'Campaigns', icon: Megaphone, roles: ['Admin', 'Manager'] },
-  { href: '/approvals', label: 'Team & Approvals', icon: CheckSquare, roles: ['Admin', 'Manager'] },
   { href: '/library', label: 'Media Library', icon: Library, roles: ['Admin', 'Manager', 'Editor'] },
 ];
 
@@ -78,6 +76,10 @@ export function AppSidebar() {
   const isActive = (href: string) => {
     if (href === '/dashboard') {
       return pathname === '/' || pathname === '/dashboard';
+    }
+    // Make settings link active for all /settings/* routes
+    if (href === '/settings') {
+      return pathname.startsWith('/settings');
     }
     return pathname.startsWith(href);
   };
