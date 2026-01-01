@@ -173,6 +173,7 @@ const SchedulePostForm = ({ onPostCreate, onDone }: { onPostCreate: (post: Omit<
     resolver: zodResolver(schedulePostSchema),
     defaultValues: {
       platform: "Instagram",
+      scheduledAt: new Date(),
     },
   });
 
@@ -261,7 +262,7 @@ const SchedulePostForm = ({ onPostCreate, onDone }: { onPostCreate: (post: Omit<
                     <Calendar
                       mode="single"
                       selected={field.value}
-                      onSelect={(day) => field.onChange(day)}
+                      onSelect={field.onChange}
                       disabled={(date) => date < new Date("1900-01-01")}
                       initialFocus
                     />
@@ -374,5 +375,3 @@ export default function ContentPlannerPage() {
     </>
   );
 }
-
-    
