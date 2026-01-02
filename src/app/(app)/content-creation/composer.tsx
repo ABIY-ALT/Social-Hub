@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, useTransition } from "react";
 import {
   Copy,
   PlusCircle,
@@ -13,7 +13,10 @@ import {
   Loader2,
   X as XIcon,
   Check,
+  ShieldCheck,
+  ShieldAlert,
 } from "lucide-react";
+import { useDebounce } from "use-debounce";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +32,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { socialIcons } from "@/components/icons";
 import type { SocialPlatform } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,10 +40,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import {
-  generateSocialMediaHashtags,
-  type GenerateSocialMediaHashtagsInput,
-  type GenerateSocialMediaHashtagsOutput,
+  generateSocialMediaHashtags
 } from "@/ai/flows/generate-social-media-hashtags";
+import { 
+    analyzeContentRiskAndRewrite,
+    type AnalyzeContentRiskAndRewriteOutput 
+} from "@/ai/flows/analyze-content-risk-and-rewrite";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -54,11 +58,67 @@ const availablePlatforms: SocialPlatform[] = [
   "TikTok",
 ];
 
+type RiskScore = "Low" | "Medium" | "High" | null;
+
+const ApprovalBadge = ({
+  riskAnalysis,
+  isAnalyzing,
+}: {
+  riskAnalysis: AnalyzeContentRiskAndRewriteOutput | null;
+  isAnalyzing: boolean;
+}) => {
+  if (isAnalyzing) {
+    return (
+      <Badge variant="secondary" className="animate-pulse">
+        <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+        Analyzing...
+      </Badge>
+    );
+  }
+
+  if (!riskAnalysis) {
+    return <Badge variant="secondary">Approval: Not Required</Badge>;
+  }
+
+  const { requiresApproval, riskScore } = riskAnalysis;
+
+  if (riskScore === "High") {
+    return (
+      <Badge variant="destructive">
+        <ShieldAlert className="mr-2 h-3 w-3" />
+        Requires Approval
+      </Badge>
+    );
+  }
+  if (riskScore === "Medium") {
+    return (
+      <Badge variant="secondary" className="border-yellow-500 text-yellow-600">
+        <ShieldAlert className="mr-2 h-3 w-3" />
+        Requires Approval
+      </Badge>
+    );
+  }
+
+  return (
+    <Badge variant="default" className="bg-green-600 hover:bg-green-600/90">
+      <ShieldCheck className="mr-2 h-3 w-3" />
+      Approved
+    </Badge>
+  );
+};
+
+
 export function Composer() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<SocialPlatform[]>(["Instagram"]);
   const [postContent, setPostContent] = useState("");
   const [media, setMedia] = useState<string[]>([]);
+  const [imageCounter, setImageCounter] = useState(1);
   const [generatingHashtags, setGeneratingHashtags] = useState(false);
+  
+  const [riskAnalysis, setRiskAnalysis] = useState<AnalyzeContentRiskAndRewriteOutput | null>(null);
+  const [debouncedContent] = useDebounce(postContent, 1000);
+  const [isAnalyzing, startRiskAnalysisTransition] = useTransition();
+
   const { toast } = useToast();
 
   const handlePlatformToggle = (platform: SocialPlatform) => {
@@ -70,9 +130,9 @@ export function Composer() {
   };
 
   const handleMediaUpload = () => {
-    // Placeholder for media upload logic
-    const newImage = `https://picsum.photos/seed/${Math.random()}/500/500`;
+    const newImage = `https://picsum.photos/seed/${imageCounter}/500/500`;
     setMedia((prev) => [...prev, newImage]);
+    setImageCounter(prev => prev + 1);
   };
 
   const removeMedia = (index: number) => {
@@ -94,7 +154,7 @@ export function Composer() {
             content: postContent,
             platforms: selectedPlatforms,
         });
-        setPostContent(prev => `${prev}\n\n${result.hashtags.join(" ")}`);
+        setPostContent(prev => `${prev}${prev ? '\n\n' : ''}${result.hashtags.join(" ")}`);
     } catch(e) {
         console.error(e);
         toast({
@@ -106,6 +166,34 @@ export function Composer() {
         setGeneratingHashtags(false);
     }
   };
+
+  const runRiskAnalysis = useCallback(async (content: string) => {
+    if (content.trim().length < 20) {
+      setRiskAnalysis(null);
+      return;
+    }
+    try {
+      const result = await analyzeContentRiskAndRewrite({
+        content,
+        platform: selectedPlatforms[0] || 'Instagram',
+        contentGoal: 'promotion', // Defaulting goal for now
+      });
+      setRiskAnalysis(result);
+    } catch (error) {
+      console.error('Risk analysis failed:', error);
+      // Silently fail, or show a subtle error indicator
+    }
+  }, [selectedPlatforms]);
+
+  useEffect(() => {
+    if (debouncedContent) {
+      startRiskAnalysisTransition(() => {
+        runRiskAnalysis(debouncedContent);
+      });
+    } else {
+        setRiskAnalysis(null);
+    }
+  }, [debouncedContent, runRiskAnalysis]);
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -196,7 +284,7 @@ export function Composer() {
                 variant="outline"
                 size="sm"
                 onClick={handleGenerateHashtags}
-                disabled={generatingHashtags}
+                disabled={generatingHashtags || !postContent}
               >
                 {generatingHashtags ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -212,7 +300,7 @@ export function Composer() {
           </CardContent>
           <CardFooter className="justify-end gap-2">
              <div className="flex-1 text-sm text-muted-foreground flex items-center gap-2">
-                <Badge variant="secondary">Approval: Not Required</Badge>
+                <ApprovalBadge riskAnalysis={riskAnalysis} isAnalyzing={isAnalyzing} />
             </div>
             <Button variant="outline">
               <Save className="mr-2 h-4 w-4" /> Save as Draft
