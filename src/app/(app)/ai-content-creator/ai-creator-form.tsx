@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Form,
@@ -33,17 +34,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Sparkles, Wand2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, Sparkles, Copy, Save } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
 
 const formSchema = z.object({
-  prompt: z.string().min(10, {
-    message: "Prompt must be at least 10 characters.",
+  topic: z.string().min(3, {
+    message: "Topic must be at least 3 characters.",
   }),
-  contentGoal: z.enum(['awareness', 'promotion', 'education']),
-  platform: z.enum(['Facebook', 'Instagram', 'X', 'LinkedIn', 'TikTok', 'YouTube']),
-  brandTone: z.string(),
+  contentType: z.string(),
+  tone: z.string(),
+  additionalInfo: z.string().optional(),
 });
 
 export function AICreatorForm() {
@@ -54,10 +57,10 @@ export function AICreatorForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      prompt: "",
-      contentGoal: "awareness",
-      platform: "Instagram",
-      brandTone: "Friendly",
+      topic: "",
+      contentType: "social_media",
+      tone: "professional",
+      additionalInfo: "",
     },
   });
 
@@ -67,39 +70,104 @@ export function AICreatorForm() {
     try {
       const output = await generateSocialMediaContent(values as GenerateSocialMediaContentInput);
       setResult(output);
+      toast({
+        title: "Content Generated",
+        description: "Your new content is ready.",
+      });
     } catch (error) {
       console.error(error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to generate content. Please try again.",
+        title: "Error Generating Content",
+        description: "There was an issue with the AI. Please try again.",
       });
     }
     setLoading(false);
   }
+  
+  const handleCopy = () => {
+    if (result?.content) {
+      navigator.clipboard.writeText(result.content);
+      toast({ title: "Copied to clipboard!" });
+    }
+  };
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>Content Generation</CardTitle>
+          <CardTitle>Content Generator</CardTitle>
           <CardDescription>
-            Tell the AI what you want to create.
+            Fill out the details below to generate content with AI.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="contentType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Content Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a content type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="blog_post">Blog Post</SelectItem>
+                          <SelectItem value="social_media">Social Media Post</SelectItem>
+                          <SelectItem value="ad_copy">Ad Copy</SelectItem>
+                          <SelectItem value="email">Email Newsletter</SelectItem>
+                          <SelectItem value="product_description">Product Description</SelectItem>
+                          <SelectItem value="article">Article</SelectItem>
+                          <SelectItem value="script">Video Script</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="tone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Content Tone</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a tone" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="professional">Professional</SelectItem>
+                          <SelectItem value="casual">Casual</SelectItem>
+                          <SelectItem value="persuasive">Persuasive</SelectItem>
+                          <SelectItem value="friendly">Friendly</SelectItem>
+                          <SelectItem value="informative">Informative</SelectItem>
+                          <SelectItem value="humorous">Humorous</SelectItem>
+                          <SelectItem value="formal">Formal</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <FormField
                 control={form.control}
-                name="prompt"
+                name="topic"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Prompt</FormLabel>
+                    <FormLabel>Topic / Keyword</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="e.g., 'A post announcing our new summer collection of sunglasses.'"
-                        className="min-h-[120px]"
+                      <Input
+                        placeholder="e.g., 'Benefits of AI in Marketing'"
                         {...field}
                       />
                     </FormControl>
@@ -107,128 +175,74 @@ export function AICreatorForm() {
                   </FormItem>
                 )}
               />
-               <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="platform"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Platform</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a platform" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Facebook">Facebook</SelectItem>
-                          <SelectItem value="Instagram">Instagram</SelectItem>
-                          <SelectItem value="X">X (Twitter)</SelectItem>
-                          <SelectItem value="LinkedIn">LinkedIn</SelectItem>
-                          <SelectItem value="TikTok">TikTok</SelectItem>
-                          <SelectItem value="YouTube">YouTube</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="contentGoal"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Content Goal</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a goal" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="awareness">Awareness</SelectItem>
-                          <SelectItem value="promotion">Promotion</SelectItem>
-                          <SelectItem value="education">Education</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+
               <FormField
-                  control={form.control}
-                  name="brandTone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Brand Tone</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a tone" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Friendly">Friendly</SelectItem>
-                          <SelectItem value="Professional">Professional</SelectItem>
-                          <SelectItem value="Witty">Witty</SelectItem>
-                          <SelectItem value="Inspirational">Inspirational</SelectItem>
-                          <SelectItem value="Casual">Casual</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              <Button type="submit" disabled={loading} className="w-full">
-                {loading && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                control={form.control}
+                name="additionalInfo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Additional Instructions (Optional)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Any specific requirements, target audience, key points, or style guidelines..."
+                        className="min-h-[100px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-                <Sparkles className="mr-2 h-4 w-4" />
+              />
+              
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Sparkles className="mr-2 h-4 w-4" />
+                )}
                 Generate Content
               </Button>
             </form>
           </Form>
         </CardContent>
       </Card>
-      <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
+      
+      <Card className="flex flex-col">
+          <CardHeader>
               <CardTitle>Generated Content</CardTitle>
-              <CardDescription>Review and edit the AI-generated content below.</CardDescription>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => form.handleSubmit(onSubmit)()} disabled={loading}>
-                <Wand2 className="mr-2 h-4 w-4" />
-                Regenerate
-            </Button>
+              <CardDescription>Review, edit, and use the AI-generated content below.</CardDescription>
           </CardHeader>
-          <CardContent className="min-h-[300px]">
+          <CardContent className="flex-grow">
             {loading ? (
               <div className="space-y-2">
                 <Skeleton className="h-4 w-full" />
                 <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-5/6" />
                 <Skeleton className="h-4 w-3/4" />
               </div>
-            ) : result ? (
-              <Textarea
-                className="min-h-[300px] text-base"
-                defaultValue={result.content}
-              />
             ) : (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                    Generated content will appear here.
-                </div>
+              <Textarea
+                className="min-h-[300px] text-base bg-muted/30 h-full"
+                value={result?.content || "Your generated content will appear here..."}
+                readOnly={!result}
+              />
             )}
           </CardContent>
+          {result && (
+            <>
+                <Separator />
+                <CardFooter className="justify-end gap-2 pt-6">
+                    <Button variant="outline" onClick={handleCopy}>
+                        <Copy className="mr-2"/>
+                        Copy
+                    </Button>
+                    <Button>
+                        <Save className="mr-2"/>
+                        Save to Library
+                    </Button>
+                </CardFooter>
+            </>
+          )}
         </Card>
     </div>
   );

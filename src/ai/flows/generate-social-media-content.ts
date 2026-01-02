@@ -11,10 +11,10 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateSocialMediaContentInputSchema = z.object({
-  prompt: z.string().describe('The prompt for generating social media content.'),
-  contentGoal: z.enum(['awareness', 'promotion', 'education']).describe('The content goal (awareness, promotion, education).'),
-  platform: z.enum(['Facebook', 'Instagram', 'X', 'LinkedIn', 'TikTok', 'YouTube']).describe('The social media platform.'),
-  brandTone: z.string().describe('The tone of voice for the content (e.g., Friendly, Professional).'),
+  topic: z.string().describe("The topic or keyword for the content."),
+  contentType: z.string().describe("The type of content to generate (e.g., 'blog_post', 'social_media_post')."),
+  tone: z.string().describe("The desired tone of voice for the content (e.g., 'Professional', 'Casual')."),
+  additionalInfo: z.string().optional().describe("Any additional instructions, like target audience or key points to include."),
 });
 export type GenerateSocialMediaContentInput = z.infer<typeof GenerateSocialMediaContentInputSchema>;
 
@@ -31,7 +31,16 @@ const prompt = ai.definePrompt({
   name: 'generateSocialMediaContentPrompt',
   input: {schema: GenerateSocialMediaContentInputSchema},
   output: {schema: GenerateSocialMediaContentOutputSchema},
-  prompt: `You are a social media expert. Generate social media content for the following prompt, content goal, platform, and brand tone.\n\nPrompt: {{{prompt}}}\nContent Goal: {{{contentGoal}}}\nPlatform: {{{platform}}}\nBrand Tone: {{{brandTone}}}\n\nContent:`, 
+  prompt: `You are a professional content creator. Your task is to generate high-quality, engaging content based on the user's request.
+
+Content Type: {{{contentType}}}
+Topic: {{{topic}}}
+Tone: {{{tone}}}
+{{#if additionalInfo}}
+Additional Instructions: {{{additionalInfo}}}
+{{/if}}
+
+Generate the content now.`, 
 });
 
 const generateSocialMediaContentFlow = ai.defineFlow(
