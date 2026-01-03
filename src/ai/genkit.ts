@@ -1,4 +1,4 @@
-import {genkit} from 'genkit';
+import {genkit, ai} from 'genkit';
 import {googleAI} from '@genkit-ai/google-genai';
 import {openai} from 'genkitx-openai';
 import {config} from 'dotenv';
@@ -15,7 +15,9 @@ if (process.env.OPENAI_API_KEY) {
     plugins.push(openai({apiKey: process.env.OPENAI_API_KEY}));
 }
 
-export const ai = genkit({
+genkit({
   plugins: plugins,
-  model: 'openai/gpt-4-turbo',
+  defaultModel: 'openai/gpt-4-turbo',
 });
+
+export {ai};
